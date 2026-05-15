@@ -1,0 +1,61 @@
+codigo_RGB:
+
+int pinR = 9; int pinG = 10; int pinB = 11;
+int pinBuzzer = 8; int pinBtn = 2;
+int potTiempo = A0; int potR = A1; int potG = A2; int potB = A3;
+
+
+bool encendido = false;
+int estadoAnterior = HIGH;
+
+void setup() {
+  pinMode(pinR, OUTPUT); pinMode(pinG, OUTPUT); pinMode(pinB, OUTPUT);
+  pinMode(pinBuzzer, OUTPUT);
+  pinMode(pinBtn, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  int lectura = digitalRead(pinBtn);
+  if (lectura == LOW && estadoAnterior == HIGH) {
+    encendido = !encendido;
+    delay(200);
+  }
+  estadoAnterior = lectura;
+
+ 
+  if (encendido == true) {
+   
+    int r = (analogRead(potR) * 255) / 1023;
+    int g = (analogRead(potG) * 255) / 1023;
+    int b = (analogRead(potB) * 255) / 1023;
+    float v_seg = (analogRead(potTiempo) * 3.0) / 1023.0;
+
+   
+    Serial.print("1° Renglón => Tiempo: "); Serial.println(v_seg);
+    Serial.println("2° Renglón => ");
+    Serial.print("R:"); Serial.println(r);
+    Serial.print("G:"); Serial.println(g);
+    Serial.print("B:"); Serial.println(b);
+
+    analogWrite(pinR, r);
+    analogWrite(pinG, g);
+    analogWrite(pinB, b);
+    tone(pinBuzzer, 1000, 100);
+
+ 
+    delay(v_seg * 1000);
+
+   
+    analogWrite(pinR, 0); analogWrite(pinG, 0); analogWrite(pinB, 0);
+    delay(100);
+
+  } else {
+   
+    analogWrite(pinR, 0);
+    analogWrite(pinG, 0);
+    analogWrite(pinB, 0);
+    noTone(pinBuzzer);
+  }
+}
